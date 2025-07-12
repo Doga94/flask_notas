@@ -36,6 +36,14 @@ def create_note():
     
     return render_template("note_form.html")
 
+@app.route("/delete/<int:note_id>", methods=["POST"])
+def delete_note(note_id):
+    note =Note.query.get_or_404(note_id)
+    db.session.delete(note)
+    db.session.commit()
+    flash("🚮 Nota eliminada con éxito")
+    return redirect(url_for("home"))
+
 class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
