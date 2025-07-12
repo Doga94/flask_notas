@@ -10,5 +10,13 @@
     <p>Esto es lo que se aprende de lo basico de flask</p>
 
     <a href="{{ url_for('create_note') }}">Crear nueva nota</a>
+
+    <ul>
+        {% for note in notes %}
+            <li><Strong>{{ note.title }}</Strong>: {{ note.content }}</li>
+        {% else %}
+            <li>No hay notas aún</li>
+        {% endfor %}
+    </ul>
 </body>
 </html>

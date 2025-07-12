@@ -7,6 +7,17 @@
 </head>
 <body>
     <h1>Crear una nota</h1>
+
+    {% with mensajes = get_flashed_messages() %}
+        {% if mensajes %}
+            <ul>
+                {% for msg in mensajes %}
+                    <li>{{ msg }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
     <form method="POST">
         <label for="title">Título:</label>
         <input type="text" name="title" id="title" required>
