@@ -20,12 +20,12 @@
 
     <form method="POST">
         <label for="title">Título:</label>
-        <input type="text" name="title" id="title" required>
+        <input type="text" name="title" id="title" value="{{ note.title if note else '' }}" required>
         <br>
         <label for="content">Contenido:</label>
-        <input type="text" name="content" id="content" required>
+        <input type="text" name="content" id="content" value="{{ note.content if note else '' }}" required>
         <br>
-        <input type="submit" value="Guardar nota">
+        <input type="submit" value="{% if note %}Actualizar{% else %}Guardar nota{% endif %}">
     </form>
     <br>
     <a href="/">Volver al Inicio</a>

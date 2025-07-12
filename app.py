@@ -44,6 +44,26 @@ def delete_note(note_id):
     flash("🚮 Nota eliminada con éxito")
     return redirect(url_for("home"))
 
+@app.route("/edit/<int:note_id>", methods=["GET", "POST"])
+def edit_note(note_id):
+    note = Note.query.get_or_404(note_id)
+
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        content = request.form.get("content", "").strip()
+
+        if not title or not content:
+            flash("❌ Todos los campos son obligatorios.")
+            return render_template("note_form.html", note=note)
+        
+        note.title = title
+        note.content = content
+        db.session.commit()
+        flash("✅ Nota actualizada correctamente.")
+        return redirect(url_for("home"))
+    
+    return render_template("note_form.html", note=note)
+
 class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
