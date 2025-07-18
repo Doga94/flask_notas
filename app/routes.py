@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from app.models import Note
+from app.models import Note, User
 from app import db
 
 main = Blueprint('main', __name__)
@@ -19,7 +19,9 @@ def create_note():
             flash("❌ Todos los campos son obligatorios.")
             return render_template("note_form.html")
 
-        note = Note(title=title, content=content)
+        user = User.query.filter_by(username="David").first()
+
+        note = Note(title=title, content=content, user=user)
         db.session.add(note)
         db.session.commit()
 
@@ -55,3 +57,10 @@ def delete_note(note_id):
     db.session.commit()
     flash("🗑️ Nota eliminada con éxito")
     return redirect(url_for("main.home"))
+
+@main.before_app_request
+def create_sample_user():
+    if not User.query.filter_by(username="David").first():
+        user = User(username="David", email="david@example.com")
+        db.session.add(user)
+        db.session.commit()
