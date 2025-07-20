@@ -1,8 +1,18 @@
+from functools import wraps
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from app.models import Note, User
 from app import db
 
 main = Blueprint('main', __name__)
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "user_id" not in session:
+            flash("Debes iniciar sesión para acceder")
+            return redirect(url_for("main.login"))
+        return f(*args, **kwargs)
+    return decorated_function
 
 @main.route("/")
 def home():
@@ -14,6 +24,7 @@ def home():
     return render_template("home.html", notes=notes)
 
 @main.route("/create", methods=["GET", "POST"])
+@login_required
 def create_note():
     if "user_id" not in session:
         flash("Debe iniciar sesión para crear notas")
@@ -38,6 +49,7 @@ def create_note():
     return render_template("note_form.html")
 
 @main.route("/edit/<int:note_id>", methods=["GET", "POST"])
+@login_required
 def edit_note(note_id):
     note = Note.query.get_or_404(note_id)
 
@@ -59,6 +71,7 @@ def edit_note(note_id):
     return render_template("note_form.html", note=note)
 
 @main.route("/delete/<int:note_id>", methods=["POST"])
+@login_required
 def delete_note(note_id):
     note = Note.query.get_or_404(note_id)
     db.session.delete(note)

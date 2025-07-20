@@ -7,8 +7,9 @@
 </head>
 <body>
     <h1>Flask desde cero</h1>
-    <p>Esto es lo que se aprende de lo basico de flask</p>
-
+    {% if session.get("username") %}
+        <p>👤 Bienvenido, {{ session["username"] }} | <a href="{{ url_for('main.logout') }}">Cerrar sesión</a></p>
+    {% endif %}
     <a href="{{ url_for('main.create_note') }}">Crear nueva nota</a>
 
     <ul>
