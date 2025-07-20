@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>Login</title>
 </head>
 <body>
@@ -10,20 +11,21 @@
 
     {% with mensajes = get_flashed_messages() %}
         {% if mensajes %}
-            <ul>
-                {% for msg in mensajes %}
-                    <li>{{ msg }}</li>
-                {% endfor %}
-            </ul>
+            {% for msg in mensajes %}
+                <div class="alert alert-info">{{ msg }}</div>
+            {% endfor %}
         {% endif %}
     {% endwith %}
 
-    <form method="POST">
-        <label for="username">Usuario:</label>
-        <input type="text" name="username" required>
-        <input type="submit" value="Entrar">
+    <form method="POST" class="mb-3">
+        <div class="mb-3">
+            <label for="username" class="form-label">Usuario:</label>
+            <input type="text" name="username" class="form-control" required>
+        </div>
+        <input type="submit" value="Entrar" class="btn btn-primary">
     </form>
 
     <a href="{{ url_for('main.register') }}">¿No tiene cuenta? Regístrarse</a>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
