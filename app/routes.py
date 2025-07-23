@@ -1,6 +1,7 @@
 from functools import wraps
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from app.models import Note, User
+from app.forms import NoteForm
 from app import db
 
 main = Blueprint('main', __name__)
@@ -26,49 +27,29 @@ def home():
 @main.route("/create", methods=["GET", "POST"])
 @login_required
 def create_note():
-    if "user_id" not in session:
-        flash("Debe iniciar sesión para crear notas")
-        return redirect(url_for('main.login'))
-
-    if request.method == "POST":
-        title = request.form.get("title", "").strip()
-        content = request.form.get("content", "").strip()
-
-        if not title or not content:
-            flash("❌ Todos los campos son obligatorios.")
-            return render_template("note_form.html")
-
-        user_id = session["user_id"]
-        note = Note(title=title, content=content, user_id=user_id)
-
+    form = NoteForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=session.get("username")).first()
+        note = Note(title=form.title.data.strip(), content=form.content.data.strip(), user=user)
         db.session.add(note)
         db.session.commit()
-
         flash("✅ Nota guardada")
         return redirect(url_for("main.home"))
-    return render_template("note_form.html")
+    return render_template("note_form.html", form=form)
 
 @main.route("/edit/<int:note_id>", methods=["GET", "POST"])
 @login_required
 def edit_note(note_id):
     note = Note.query.get_or_404(note_id)
+    form = NoteForm(obj=note)
 
-    if request.method == "POST":
-        title = request.form.get("title", "").strip()
-        content = request.form.get("content", "").strip()
-
-        if not title or not content:
-            flash("❌ Todos los campos son obligatorios.")
-            return render_template("note_form.html", note=note)
-
-        note.title = title
-        note.content = content
-        db.session.commit()
-
-        flash("✅ Nota actualizada correctamente.")
+    if form.validate_on_submit():
+        note.title = form.title.data.strip()
+        note.content = form.content.data.strip()
+        db,session.commit()
+        flash("✅ Nota actualizada")
         return redirect(url_for("main.home"))
-
-    return render_template("note_form.html", note=note)
+    return render_template("note_form.html", form=form)
 
 @main.route("/delete/<int:note_id>", methods=["POST"])
 @login_required

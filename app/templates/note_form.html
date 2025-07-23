@@ -17,16 +17,17 @@
         {% endif %}
     {% endwith %}
 
-    <form method="POST" class="mb-3">
+    <form method="POST">
+        {{ form.hidden_tag() }}
         <div class="mb-3">
-            <label for="title" class="form-label">Título:</label>
-            <input type="text" name="title" id="title" class="form-control" value="{{ note.title if note else '' }}" required>
+            {{ form.title.label(class="form-label") }}
+            {{ form.title(class="form-control") }}
         </div>
-        <div class="mb-3">
-            <label for="content" class="form-label">Contenido:</label>
-            <input type="text" name="content" id="content" class="form-control" value="{{ note.content if note else '' }}" required>
+        <div class="mb 3">
+            {{ form.content.label(class="form-label") }}
+            {{ form.content(class="form-control") }}
         </div>
-        <input type="submit" value="{% if note %}Actualizar{% else %}Guardar nota{% endif %}">
+        {{ form.submit(class="btn btn-primary") }}
     </form>
     <br>
     <a href="/">Volver al Inicio</a>
