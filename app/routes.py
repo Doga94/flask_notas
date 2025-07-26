@@ -4,6 +4,8 @@ from app.models import Note, User
 from app.forms import NoteForm
 from app import db
 
+from werkzeug.security import generate_password_hash, check_password_hash
+
 main = Blueprint('main', __name__)
 
 def login_required(f):
@@ -65,8 +67,9 @@ def register():
     if request.method== "POST":
         username = request.form.get("username", "").strip()
         email = request.form.get("email", "").strip()
+        password = request.form.get("password", "").strip()
 
-        if not username or not email:
+        if not username or not email or not password:
             flash("❌ Todos los campos son obligatorios")
             return render_template("register.html")
         
@@ -74,7 +77,9 @@ def register():
             flash("❌ El usuario ya eiste")
             return render_template("register.html")
         
-        user = User(username=username, email=email)
+        hashed_password = generate_password_hash(password)
+
+        user = User(username=username, email=email, password=hashed_password)
         db.session.add(user)
         db.session.commit()
 
@@ -86,9 +91,10 @@ def register():
 def login():
     if request.method=="POST":
         username = request.form.get("username", "").strip()
+        password = request.form.get("password", "").strip()
 
         user = User.query.filter_by(username=username).first()
-        if not user:
+        if not user or not check_password_hash(user.password, password):
             flash("❌ Usuario no encontrado")
             return render_template("login.html")
         
