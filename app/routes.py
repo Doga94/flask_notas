@@ -110,6 +110,13 @@ def logout():
     flash("Has cerrado sesión")
     return redirect(url_for("main.login"))
 
+@main.before_app_request
+def validar_usuario():
+    rutas_protegidas = ["home", "create_note", "edit_note", "delete_note"]
+    if request.endpoint in rutas_protegidas and "user_id" not in session:
+        flash("Debe iniciar sesión para acceder")
+        return redirect(url_for("main.login"))
+
 #Esto es solo para validar los usuarios es una test
 # @main.before_app_request
 # def create_sample_user():
