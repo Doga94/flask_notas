@@ -6,6 +6,9 @@ from app import db
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from app.utils import validate_required_fields
+from app.messages import REQUIRED_FIELDS, USER_EXISTS, USER_NOT_FOUND, LOGIN_SUCCESS
+
 main = Blueprint('main', __name__)
 
 def login_required(f):
@@ -48,7 +51,7 @@ def edit_note(note_id):
     if form.validate_on_submit():
         note.title = form.title.data.strip()
         note.content = form.content.data.strip()
-        db,session.commit()
+        db.session.commit()
         flash("✅ Nota actualizada")
         return redirect(url_for("main.home"))
     return render_template("note_form.html", form=form)
@@ -65,21 +68,22 @@ def delete_note(note_id):
 @main.route("/register", methods=["GET", "POST"])
 def register():
     if request.method== "POST":
-        username = request.form.get("username", "").strip()
-        email = request.form.get("email", "").strip()
-        password = request.form.get("password", "").strip()
+        form_data = {
+            "username": request.form.get("username", "").strip(),
+            "email": request.form.get("email", "").strip(),
+            "password": request.form.get("password", "").strip()
+        }
 
-        if not username or not email or not password:
-            flash("❌ Todos los campos son obligatorios")
+        missing_fields = validate_required_fields(form_data, ["username", "email", "password"])
+        if missing_fields:
+            flash(REQUIRED_FIELDS)
             return render_template("register.html")
         
-        if User.query.filter_by(username=username).first():
-            flash("❌ El usuario ya eiste")
+        if User.query.filter_by(username=form_data["username"]).first():
+            flash(USER_EXISTS)
             return render_template("register.html")
         
-        hashed_password = generate_password_hash(password)
-
-        user = User(username=username, email=email, password=hashed_password)
+        user = User(**form_data)
         db.session.add(user)
         db.session.commit()
 
@@ -93,11 +97,15 @@ def login():
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "").strip()
 
-        user = User.query.filter_by(username=username).first()
-        if not user or not check_password_hash(user.password, password):
-            flash("❌ Usuario no encontrado")
+        if not username or not password:
+            flash("❌ Username and password are required")
             return render_template("login.html")
         
+        user = User.query.filter_by(username=username).first()
+        if not user:
+            flash(USER_NOT_FOUND)
+            return render_template("login.html")
+
         session["user_id"] = user.id
         session["username"] = user.username
         flash(f"✅ Bienvenido, {user.username}")

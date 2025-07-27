@@ -11,10 +11,10 @@
         <a href="{{ url_for('main.home') }}" class="navbar-brand">🗒️ FlaskNotas</a>
         <div class="ms-auto">
             {% if session.get("username") %}
-                <span class=",e-3">👤 {{ session["username"] }}</span>
+                <span class="me-3">👤 {{ session["username"] }}</span>
                 <a href="{{ url_for('main.logout') }}" class="btn btn-outline-danger btn-sm">Cerrar sesión</a>
             {% else %}
-                <a href="{{ url_form('main.login') }}" class="btn btn-outline-primary btn-sm">Login</a>
+                <a href="{{ url_for('main.login') }}" class="btn btn-outline-primary btn-sm">Login</a>
             {% endif %}
         </div>
     </nav>
